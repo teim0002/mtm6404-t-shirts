@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>T-Shirts</title>
+
+    <link href="style.css" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript" src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script type="text/javascript" src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone@7.19.1/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="app"></div>
+
+
+
+
+    <script type="text/javascript" src="t-shirts.js"></script>
+    <script type="text/babel">
+      const container = document.getElementById("app");
+      const app       = ReactDOM.createRoot(container);
+
+
+      // Components
+      const App = () => {
+        return(
+                <>
+                    <TShitrsComponent />
+                </>
+        );
+      };
+
+      const SingleTShirtComponent = (props) => {
+
+          const amount      = props.amount;
+          const setAmount   = props.setAmount;
+          const ttshirts    = props.ttshirts;
+          const setTTShirts = props.setTTShirts;
+
+          React.useEffect(() => {
+                setAmount(1);
+          }, []);
+
+          React.useEffect (() => {
+                setTTShirts(ttshirts);
+          }, []);
+
+          const handleBuy = (tshirt, amount) => {
+                let newTshirts = [];
+
+                for(let i=0; i < ttshirts.length; i++)
+                {
+                    newTshirts.push(ttshirts[i]);
+
+                    if(newTshirts[i].title === tshirt)
+                    {
+                        newTshirts[i].stock = newTshirts[i].stock - amount;
+                    }
+                }
+
+                setTTShirts( [...newTshirts] );
+          };
+
+          const handleAmountChange = (amount) => {
+                setAmount(amount);
+          };
+
+          const isAvailable = props.stock > 0 ? true : false;
+
+          const selectOption = [];
+
+          if(isAvailable === true)
+          {
+            for(let i = 0; i < props.stock; i++)
+            {
+              selectOption.push(<option key={i} value={i+1}>{i+1}</option>);
+            }
+          }
+
+          return(
+                  <div className="grid-item" key={props.key}>
+                      <img src={"images/" + props.image}/>
+                      <h2>{props.title}</h2>
+                      <h3>${props.price}</h3>
+                      <h3>{props.stock > 0 ? props.stock + " left!" : "Out of Stock"}</h3>
+                      {isAvailable === true &&
+                        <div>
+                            <select value={amount} onChange={(e)=>{handleAmountChange(e.target.value)}}>{selectOption}</select>
+                            <button onClick={ (e)=>{handleBuy(props.title, amount)} }>Buy</button>
+                        </div>
+                      }
+                  </div>
+          );
+      };
+
+      const TShitrsComponent = () => {
+
+          let i = 0;
+
+          const [ttshirts, setTTShirts] = React.useState(tshirts);
+          const [amount, setAmount]     = React.useState(1);
+
+          return(
+                <div className="container">
+                  <h1>T-Shirts</h1>
+                  <div className="grid-container">
+                      {ttshirts.map( (tshirt) =>
+                            <SingleTShirtComponent key={i++} ttshirts={ttshirts} setTTShirts={setTTShirts}  amount={amount} setAmount={setAmount} title={tshirt.title} stock={tshirt.stock} price={tshirt.price} image={tshirt.image}/>
+                       )}
+                  </div>
+                </div>
+          );
+      };
+
+      // End of Components
+      app.render(<App />);
+
+    </script>
+  </body>
+</html>
